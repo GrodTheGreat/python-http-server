@@ -1,9 +1,13 @@
 import socket
 
 HOST = '127.0.0.1'  # localhost
-PORT = 80  # HTTP
+PORT = 6969
 
-print('Starting http server...')
+response: bytes = b'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nHello, World!\r\n\r\n'
+print('Response:')
+print(response)
+
+print('Starting HTTP server...')
 
 with socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM) as soc:
     print('Socket created...')
@@ -19,13 +23,29 @@ with socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM) as soc:
     connection, address = soc.accept()
 
     with connection:
-        print('Connect by', address)
-        while True:
-            data = connection.recv(1024)
-            print(data)
-            if not data:
-                break
-            connection.sendall(data)
+        print('Connected by', address)
+        # Receive only a small portion of the request
+        data: bytes = connection.recv(1024)
+        print("Request received:")
+        request_data: bytes = data
+        request: str = request_data.decode()
+
+        request_items = request.split(sep='\r\n')
+        start_line = request_items.pop(0)
+        print(start_line)
+        for item in request_items:
+            print(item)
+
+        print('Reading start line...')
+        start_line_items: [str] = start_line.split(sep=' ')
+        method: str = start_line_items[0]
+        request_target: str = start_line_items[1]
+        protocol: str = start_line_items[2]
+        print(f'Method: {method}, Target: {request_target}, Protocol: {protocol}')
+
+        # Send the response
+        connection.sendall(data=response)
+        print('Response sent, closing connection...')
 
     print('Socket closed...')
 
