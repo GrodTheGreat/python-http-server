@@ -37,7 +37,7 @@ with socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM) as soc:
             print(item)
 
         print('Reading start line...')
-        start_line_items: [str] = start_line.split(sep=' ')
+        start_line_items: list[str] = start_line.split(sep=' ')
         method: str = start_line_items[0]
         request_target: str = start_line_items[1]
         protocol: str = start_line_items[2]
